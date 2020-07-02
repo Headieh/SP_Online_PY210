@@ -3,6 +3,24 @@ from donor_models import Donor, DonorCollection
 import os
 import time
 
+def test_add_donor():
+    dt = DonorCollection()
+    p1, p2 = Donor('Mo'), Donor('Larry')
+    dt = DonorCollection()
+    dt.add_donors(p1, p2)
+    ini_list=[p1.name,p2.name]
+    expected=("[{0}]".format(
+                       ', '.join(map(str, ini_list))))
+    assert str(dt.list_donors) == expected
+
+def test_find_donor():
+    dt = DonorCollection()
+    p1 = Donor('Mo')
+    dt = DonorCollection()
+    dt.add_donors(p1)
+    assert str(dt.find_donor('mo')) == 'Mo'
+    assert str(dt.find_donor('Karen')) == 'None'
+
 def test_create_donor():
     d = Donor('Sue')
     assert d.name == 'Sue'
@@ -28,11 +46,8 @@ def test_thanks_all():
 def test_thanks():
     expected =  (f"""
 Dear Larry,
-
 Thank you for your very kind donation of $90.00
-
 It will be put to very good use.
-
 Sincerely,
 -The Team""")
 
@@ -43,7 +58,6 @@ Sincerely,
     donor1 = donor_new
     donor1.add_donation(40,50)
     assert donor1.send_thank_you(donor1.d_tot) == expected
-
 
 def test_donor_collection():
     dc = DonorCollection()

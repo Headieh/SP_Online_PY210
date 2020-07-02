@@ -7,18 +7,26 @@ class Donor:
     """
 
     def __init__(self, name):
-        self.name = name
-        self.donations = []
+        self._name = name
+        self._donations = []
+
+    @property # attribute: last_name. it is a read only attribute.
+    def name(self):
+        return self._name
+
+    @property # attribute: donation
+    def donations(self):
+        return self._donations
 
     @property
     def d_num(self):
         """number of donations"""
-        return len(self.donations)
+        return len(self._donations)
 
     @property
     def d_tot(self):
         """sum of donations"""
-        return sum(self.donations)
+        return sum(self._donations)
 
     @property
     def d_avg(self):
@@ -32,17 +40,14 @@ class Donor:
     def add_donation(self, *args):
         """add donation amount to a donor object"""
         for i in args:
-            self.donations.append(i)
+            self._donations.append(i)
 
     def send_thank_you(self, money_amount):
         """Sends a thank you when donation is made"""
         return f"""
-Dear {self.name},
-
+Dear {self._name},
 Thank you for your very kind donation of ${money_amount:.2f}
-
 It will be put to very good use.
-
 Sincerely,
 -The Team"""
 
@@ -51,7 +56,7 @@ Sincerely,
         return self.total_donation < other.total_donation
 
     def __repr__(self):
-        return self.name
+        return self._name
 
 
 class DonorCollection:
@@ -73,6 +78,12 @@ class DonorCollection:
     def list_donors(self, donors = []):
         self.donor_obs_list.extend(donors)
 
+
+    def find_donor(self, new_donor):
+        return next((donor for donor in self.donor_obs_list
+                     if(donor._name.lower() ==
+                        new_donor.lower())), None)
+
     def add_donors(self, *args):
         """Add a donor to the collection."""
         self.list_donors.extend(args)
@@ -88,29 +99,23 @@ class DonorCollection:
         timestr = time.strftime("%Y%m%d-%H%M%S")
         os.mkdir(timestr)
         for k in self.list_donors:
-            filename = os.path.join(parent, timestr + "/" + k.name + '.txt')
+            filename = os.path.join(parent, timestr + "/" + k._name + '.txt')
             with open(filename, 'w') as file:
-                file.write(self.write_thanks_all(k.name, k.d_tot, k.d_num))
+                file.write(self.write_thanks_all(k._name, k.d_tot, k.d_num))
         print("Letters have been outputted for all donors")
 
     def write_thanks_all(self, name, total,numb):
         mass_text_1 = f"""
         Dear {name},
-
         Thank you for your very kind donation of ${total:.2f}
-
         It will be put to very good use.
-
                                Sincerely,
                                   -The Team"""
 
         mass_text_2 = f"""
         Dear {name},
-
         Thank you for your very kind donations totaling ${total:.2f}
-
         It will be put to very good use.
-
                                Sincerely,
                                   -The Team"""
 

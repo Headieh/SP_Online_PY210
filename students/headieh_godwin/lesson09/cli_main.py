@@ -50,21 +50,20 @@ def thanks():
             print (donor1.send_thank_you(amount))
 
 def donor_check(r1):
-    """revisit and recode this"""
-    for i, x in enumerate(_dc.list_donors):
-        if x.name == r1:
-            return _dc.list_donors[i]
-    else:
+    """checks if its an existing donor or new"""
+    the_donor = _dc.find_donor(r1)
+    print(the_donor)
+    if the_donor is None:
         donor_new = dm.Donor(r1)
         _dc.add_donors(donor_new)
         return donor_new
+    else:
+        return the_donor
 
 
 def original_prompt():
     answers = input(f"""
-
 Choose an action:
-
 1 - Send a Thank You to a single donor.
 2 - Create a Report.
 3 - Send letters to all donors.
