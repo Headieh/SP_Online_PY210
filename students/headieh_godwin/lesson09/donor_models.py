@@ -124,6 +124,13 @@ class DonorCollection:
         else:
             return mass_text_2
 
+    @staticmethod
+    def sort_key(self):
+        return (sum(self._donations), self._name)
+
+    def sort_donors(self):
+        return sorted(self.donor_obs_list, key=DonorCollection.sort_key)
+
 
     def report(self):
 
@@ -140,19 +147,11 @@ class DonorCollection:
         raw.append('-'*len(header))
         raw.append('\n')
 
-        for this_ob in self.list_donors:
+        for this_ob in self.sort_donors():
             name = this_ob.name
             num = this_ob.d_num
             total= this_ob.d_tot
             aveg = this_ob.d_avg
-            raw_temp.append({'name': name,
-                        'total': total,
-                        'number': num,
-                        'average': aveg})
-
-        sort_data = (sorted(raw_temp, key = lambda i: i['total'], reverse=True))
-
-        for i in sort_data:
-            raw.append(f"{i['name']:<30}${i['total']:>10.2f}{i['number']:>12}   ${i['average']:>15.2f}")
+            raw.append(f"{name:<30}${total:>10.2f}{num:>12}   ${aveg:>15.2f}")
             raw.append('\n')
         return "".join(raw)
