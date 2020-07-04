@@ -2,7 +2,10 @@
 
 import sys
 import re
+import io
+import os
 import donor_models as dm
+import webbrowser
 
 _dc = dm.DonorCollection()
 
@@ -19,7 +22,6 @@ def valid_money():
         except ValueError:
             print("Invalid value")
 
-
 # Get name
 def valid_name():
     while True:
@@ -31,9 +33,10 @@ def valid_name():
             print('No name entered')
         elif r2 == '':
             print('Not a valid name')
+        elif len(r2) > 30:
+            print('Use a nick name - your name is too long')
         else:
             return r
-
 
 def thanks():
     """adds donation and sends a thanks message"""
@@ -52,14 +55,12 @@ def thanks():
 def donor_check(r1):
     """checks if its an existing donor or new"""
     the_donor = _dc.find_donor(r1)
-    print(the_donor)
     if the_donor is None:
         donor_new = dm.Donor(r1)
         _dc.add_donors(donor_new)
         return donor_new
     else:
         return the_donor
-
 
 def original_prompt():
     answers = input(f"""
@@ -107,14 +108,14 @@ def initial():
     d5.add_donation(2)
     _dc.add_donors(d1,d2,d3,d4,d5)
 
-
 def report():
     """displays donor report"""
-    print(_dc.report())
+    print(_dc.create_report_content())
+    _dc.create_html_report()
 
 def thanks_all():
     """sends thanks to everyone"""
-    print (_dc.thanks_all())
+    _dc.thanks_all()
 
 
 if __name__ == "__main__":
