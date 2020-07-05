@@ -3,54 +3,58 @@ from donor_models import Donor, DonorCollection
 import os
 import time
 
-def test_add_donor():
-    dt = DonorCollection()
-    p1, p2 = Donor('Mo'), Donor('Larry')
-    dt = DonorCollection()
-    dt.add_donors(p1, p2)
-    ini_list=[p1.name,p2.name]
-    expected=("[{0}]".format(
-                       ', '.join(map(str, ini_list))))
-    assert str(dt.list_donors) == expected
-
-def test_find_donor():
-    dt = DonorCollection()
-    p1 = Donor('Mo')
-    dt = DonorCollection()
-    dt.add_donors(p1)
-    assert str(dt.find_donor('mo')) == 'Mo'
-    assert str(dt.find_donor('Karen')) == 'None'
+p1, p2 = Donor('Mo'), Donor('Larry')
+p2.add_donation(20)
+p1.add_donation(4,2)
+dt = DonorCollection()
+dt.add_donors(p1,p2)
 
 def test_create_donor():
-    d = Donor('Sue')
-    assert d.name == 'Sue'
+    assert p1._name == 'Mo'
+    assert p2._name == 'Larry'
+
+def test_add_donation():
+    assert p1._donations[1] == 2
 
 def test_math():
-    d = Donor('Karen')
-    d.add_donation(4,2)
-    assert d.d_tot == 6
-    assert d.d_num == 2
-    assert d.d_avg == 3
+    assert p1.d_tot == 6
+    assert p1.d_num == 2
+    assert p1.d_avg == 3
 
-def test_thanks_all():
-    tdc = DonorCollection()
-    don = Donor('Mo')
-    don.add_donation(4,2)
-    tdc.add_donors(don)
-    tdc.thanks_all()
+def test_add_donors():
+    assert len(dt.list_donors) == 2
+    assert dt.list_donors[0].name == 'Mo'
+    assert dt.list_donors[0].donations[1] == 2
+    assert dt.list_donors[1].name == 'Larry'
+    assert dt.list_donors[1].donations[0] == 20
+    assert dt.find_donor('Karen') == None
+    assert dt.find_donor('Mo') != None
+    assert dt.find_donor('mo') != None
+
+def test_thanks_mass():
+    my_str1 = dt.write_thanks_all(name=p1._name,total = p1.d_tot,numb = p1.d_num ).strip()
+    assert 'Mo' in my_str1
+    assert '6' in my_str1
+    assert 'totaling' in my_str1
+    my_str2 = dt.write_thanks_all(name=p2._name,total = p2.d_tot,numb = p2.d_num ).strip()
+    assert 'Larry' in my_str2
+    assert '20' in my_str2
+    assert 'totaling' not in my_str2
+
+def test_thanks_export():
+    dt.thanks_all()
     parent = os.getcwd()
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    filename = os.path.join(parent, timestr + "/" + 'Mo.txt')
+    filename = os.path.join(parent, timestr + "letter/" + 'Mo.txt')
     assert os.path.exists(filename)
 
-def test_thanks():
+def test_thanks_1addition():
     expected =  (f"""
 Dear Larry,
 Thank you for your very kind donation of $90.00
 It will be put to very good use.
 Sincerely,
 -The Team""")
-
     dc = DonorCollection()
     r1 = 'Larry'
     donor_new = Donor(r1)
@@ -62,3 +66,7 @@ Sincerely,
 def test_donor_collection():
     dc = DonorCollection()
     assert isinstance(dc, DonorCollection)
+
+def test_sort():# using above 'donors_db' data base
+    sortlist = dt.sort_donors()
+    assert sortlist[0]._name == 'Larry'

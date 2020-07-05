@@ -72,17 +72,13 @@ class DonorCollection:
 
     def find_donor(self, new_donor):
         return next((donor for donor in self.donor_obs_list
-                     if(donor._name.lower() ==
-                        new_donor.lower())), None)
+            if(donor._name.lower() == new_donor.lower())
+            ), None)
 
     def add_donors(self, *args):
         """Add a donor to the collection."""
         self.list_donors.extend(args)
         return self.list_donors
-
-    def __repr__(self):
-        names = [donor.name for donor in self.list_donors]
-        return ', '.join(names)
 
     def thanks_all(self):
         parent = os.getcwd()
@@ -142,7 +138,7 @@ class DonorCollection:
         """ prints a report of donors"""
         raw.append(self.create_report_header())
         for this_ob in self.sort_donors():
-            name = this_ob.name
+            name = this_ob._name
             num = this_ob.d_num
             total= this_ob.d_tot
             aveg = this_ob.d_avg
@@ -179,7 +175,7 @@ class DonorCollection:
 
         for this_ob in self.sort_donors():
             donor_tr = Tr()
-            name = this_ob.name
+            name = this_ob._name
             num = this_ob.d_num
             total= this_ob.d_tot
             aveg = this_ob.d_avg
