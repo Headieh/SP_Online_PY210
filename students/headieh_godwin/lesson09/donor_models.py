@@ -1,13 +1,12 @@
+""" Donor and Donor Clooection Classes responsible for donor data"""
 import os
 import time
 import webbrowser
-from html_render import *
 import io
+from html_render import *
 
 class Donor:
-    """
-    Class responsible for donor data encapsulation
-    """
+    """ Class responsible for donor data encapsulation"""
 
     def __init__(self, name):
         self._name = name
@@ -15,10 +14,12 @@ class Donor:
 
     @property
     def name(self):
+        """name"""
         return self._name
 
     @property
     def donations(self):
+        """donations"""
         return self._donations
 
     @property
@@ -34,11 +35,10 @@ class Donor:
     @property
     def d_avg(self):
         """average donation"""
-
         if self.d_num == 0:
             return 0
         else:
-            return (self.d_tot/self.d_num)
+            return self.d_tot/self.d_num
 
     def add_donation(self, *args):
         """add donation amount to a donor object"""
@@ -57,8 +57,9 @@ Sincerely,
 class DonorCollection:
     """ Class responsible for donor collection data encapsulation """
 
-    def __init__(self, donors=[]):
+    def __init__(self):
         """Create a collection of donors"""
+        donors=[]
         self.donor_obs_list = donors
 
     @property
@@ -67,13 +68,15 @@ class DonorCollection:
         return self.donor_obs_list
 
     @list_donors.setter
-    def list_donors(self, donors = []):
+    def list_donors(self, donors):
+        """list of donors"""
         self.donor_obs_list.extend(donors)
 
     def find_donor(self, new_donor):
+        """find donor in list"""
         return next((donor for donor in self.donor_obs_list
-            if(donor._name.lower() == new_donor.lower())
-            ), None)
+                     if(donor._name.lower() == new_donor.lower())
+                     ), None)
 
     def add_donors(self, *args):
         """Add a donor to the collection."""
@@ -81,6 +84,7 @@ class DonorCollection:
         return self.list_donors
 
     def thanks_all(self):
+        """export thankyous for all"""
         parent = os.getcwd()
         timestr = time.strftime("%Y%m%d-%H%M%S")
         os.mkdir(timestr+'letter')
@@ -90,7 +94,8 @@ class DonorCollection:
                 file.write(self.write_thanks_all(k._name, k.d_tot, k.d_num))
         print("Letters have been outputted for all donors")
 
-    def write_thanks_all(self, name, total,numb):
+    def write_thanks_all(self, name, total, numb):
+        """write thankyous for all"""
         mass_text_1 = f"""
         Dear {name},
         Thank you for your very kind donation of ${total:.2f}
@@ -112,12 +117,15 @@ class DonorCollection:
 
     @staticmethod
     def sort_key(self):
+        """sort key is total donation amt"""
         return (sum(self._donations), self._name)
 
     def sort_donors(self):
+        """sort the donors by reversing the sortkey"""
         return sorted(self.donor_obs_list, key=DonorCollection.sort_key, reverse=True)
 
     def create_report_header(self):
+        """report header"""
         title_formater = '{:<30}{:<15}{:<15}{:5}\n'
         col_labels = ["Donor Name",
                       "Total Given",
@@ -125,22 +133,21 @@ class DonorCollection:
                       "Average Gift"]
         title = title_formater.format(*col_labels)
         seperate_line = '-' * len(title)
-        title =f"""
+        title = f"""
 {title}
 {seperate_line}
 
 """
-        return (title)
+        return title
 
     def create_report_content(self):
-        raw =[]
-        raw_temp=[]
         """ prints a report of donors"""
+        raw = []
         raw.append(self.create_report_header())
         for this_ob in self.sort_donors():
             name = this_ob._name
             num = this_ob.d_num
-            total= this_ob.d_tot
+            total = this_ob.d_tot
             aveg = this_ob.d_avg
             if total > 1000000:
                 raw.append(f"{name:<30}${total:<14.3e}{num:<15}${aveg:<4.3e}")
@@ -150,21 +157,33 @@ class DonorCollection:
         return "".join(raw)
 
     def create_html_report(self):
+        """ opens tab with a report of donors"""
         page = Html()
         head = Head()
         style = Style()
-        style.append(Customer('#customers {border-collapse: collapse; width: 50%;margin:auto;}'))
-        style.append(Customer('#customers th {text-align: center; color: c0c0c0; border-width: 1px 1px 4px 1px; border-style: solid; border-color:black; padding: 8px; padding: 12px, 0, 12px, 0;}'))
-        style.append(Customer('#customers tr:nth-child(even) {background-color: white}'))
-        style.append(Customer('#customers tr:nth-child(odd){background-color: lightgrey}'))
-        style.append(Customer('#customers td:nth-child(even) {text-align: right}'))
-        style.append(Customer('#customers td:nth-child(odd){text-align: center}'))
-        style.append(Customer('#customers td {border: 1px solid black;padding: 8px;}'))
-        style.append(Customer('body {background-image: linear-gradient(to bottom right, white ,lightgrey); background-repeat: no-repeat; width: 100vw; height: 100vh;}'))
+        style.append(Customer('#customers {border-collapse: collapse;\
+         width: 50%;margin:auto;}'))
+        style.append(Customer('#customers th {text-align: center; \
+        color: c0c0c0; border-width: 1px 1px 4px 1px; border-style: solid;\
+         border-color:black; padding: 8px; padding: 12px, 0, 12px, 0;}'))
+        style.append(Customer('#customers tr:nth-child(even) {background-color:\
+         white}'))
+        style.append(Customer('#customers tr:nth-child(odd){background-color:\
+         lightgrey}'))
+        style.append(Customer('#customers td:nth-child(even) {text-align:\
+         right}'))
+        style.append(Customer('#customers td:nth-child(odd){text-align:\
+         center}'))
+        style.append(Customer('#customers td {border: 1px solid black;\
+        padding: 8px;}'))
+        style.append(Customer('body {background-image: \
+        linear-gradient(to bottom right, white ,black);\
+         background-repeat: no-repeat; width: 100vw; height: 100vh;}'))
         head.append(style)
         page.append(head)
         body = Body()
-        body.append(H(1, 'Donation Report', style="font-style: oblique; color: 9c9c9c; text-align:center;"))
+        body.append(H(1, 'Donation Report', style="font-style: oblique;\
+         color: 9c9c9c; text-align:center;"))
         table = Table(id='customers')
         column_list = Tr()
         column_list.append(Th('Donor Name'))
@@ -177,7 +196,7 @@ class DonorCollection:
             donor_tr = Tr()
             name = this_ob._name
             num = this_ob.d_num
-            total= this_ob.d_tot
+            total = this_ob.d_tot
             aveg = this_ob.d_avg
             donor_tr.append(Td(name))
             if this_ob.d_tot > 1000000:

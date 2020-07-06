@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-
+"""main module"""
 import sys
 import re
-import io
-import os
+#import io
+#import os
+#import webbrowser
 import donor_models as dm
-import webbrowser
 
-_dc = dm.DonorCollection()
+_DC = dm.DonorCollection()
 
-# Get money
 def valid_money():
+    """ensures valid dollar amount is inputted"""
     while True:
-        r = input("Please enter a donation amount ")
+        r_1 = input("Please enter a donation amount ")
         try:
-            amount = float(r)
+            amount = float(r_1)
             if amount < 0.01 or amount > 10000:
                 print("Invalid value")
             else:
@@ -22,47 +22,48 @@ def valid_money():
         except ValueError:
             print("Invalid value")
 
-# Get name
 def valid_name():
+    """ensures valid name is inputted"""
     while True:
-        r = input("Please enter a full name ")
-        r2= re.sub(r'[^a-zA-Z]+', '', r)
-        if r == 'list':
-            print (_dc)
-        elif r == '':
+        r_1 = input("Please enter a full name ")
+        r_2 = re.sub(r'[^a-zA-Z]+', '', r_1)
+        if r_1 == '':
             print('No name entered')
-        elif r2 == '':
+        elif r_2 == '':
             print('Not a valid name')
-        elif len(r2) > 30:
+        elif len(r_1) > 30:
             print('Use a nick name - your name is too long')
         else:
-            return r
+            return r_1
 
 def thanks():
     """adds donation and sends a thanks message"""
     response1 = valid_name()
-    if response1 == 'list':
-        print(_dc)
+    if response1.lower() == 'list':
+        print([i.name for i in _DC.list_donors])
+        return
     else:
         amount = valid_money()
-        if not amount: #if get donation returns nothing, return nothing back to main
-            return
-        else:
-            donor1 = donor_check(response1)
-            donor1.add_donation(amount)
-            print (donor1.send_thank_you(amount))
 
-def donor_check(r1):
+    if not amount: #if get donation returns nothing, return nothing back to main
+        return
+    else:
+        donor1 = donor_check(response1)
+        donor1.add_donation(amount)
+        print(donor1.send_thank_you(amount))
+
+def donor_check(r_1):
     """checks if its an existing donor or new"""
-    the_donor = _dc.find_donor(r1)
+    the_donor = _DC.find_donor(r_1)
     if the_donor is None:
-        donor_new = dm.Donor(r1)
-        _dc.add_donors(donor_new)
+        donor_new = dm.Donor(r_1)
+        _DC.add_donors(donor_new)
         return donor_new
     else:
         return the_donor
 
 def original_prompt():
+    """menu options"""
     answers = input(f"""
 Choose an action:
 1 - Send a Thank You to a single donor.
@@ -70,9 +71,10 @@ Choose an action:
 3 - Send letters to all donors.
 4 - Quit
 """)
-    return(answers)
+    return answers
 
 def main():
+    """main prompt"""
     options = {
         1: thanks,
         2: report,
@@ -91,31 +93,32 @@ def main():
             print(' Input is invalid, please input a valid option. ')
 
 def quits():
+    """Quit program"""
     print("Bye!")
     sys.exit()
 
 def initial():
     """initializes the dataset"""
-    d1 = dm.Donor('Karen')
-    d2 = dm.Donor('Susan')
-    d3 = dm.Donor('Larry')
-    d4 = dm.Donor('Curly')
-    d5 = dm.Donor('Mo')
-    d1.add_donation(20,20,100)
-    d2.add_donation(20)
-    d3.add_donation(40,50)
-    d4.add_donation(20.99,20,100)
-    d5.add_donation(2)
-    _dc.add_donors(d1,d2,d3,d4,d5)
+    d_1 = dm.Donor('Karen')
+    d_2 = dm.Donor('Susan')
+    d_3 = dm.Donor('Larry')
+    d_4 = dm.Donor('Curly')
+    d_5 = dm.Donor('Mo')
+    d_1.add_donation(20, 20, 100)
+    d_2.add_donation(20)
+    d_3.add_donation(40, 50)
+    d_4.add_donation(20.99, 20, 100)
+    d_5.add_donation(2)
+    _DC.add_donors(d_1, d_2, d_3, d_4, d_5)
 
 def report():
     """displays donor report"""
-    print(_dc.create_report_content())
-    _dc.create_html_report()
+    print(_DC.create_report_content())
+    _DC.create_html_report()
 
 def thanks_all():
     """sends thanks to everyone"""
-    _dc.thanks_all()
+    _DC.thanks_all()
 
 
 if __name__ == "__main__":
